@@ -1,0 +1,68 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# CRITICAL: Never commit extracted browser data!
+# These files contain real passwords, cookies, and personal data
+*password*.json
+*cookie*.json
+*history*.json
+*bookmark*.json
+*download*.json
+*localstorage*.json
+*sessionstorage*.json
+*results*/
+*extract_*/
+*extraction*/
+*output*/
+*extracted_data*/
+*browser_data*/
+*backup*/
+*.zip
+
+# Test files that might contain sensitive data
+test_*.py
+analyze_*.py
+demo.py
+*_test_*
+*_demo_*
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+*temp*
+
+# Never commit anything that looks like extracted data
+*Edge_*.json
+*Chrome_*.json
+*Brave_*.json
+*Firefox_*.json
+*Opera_*.json
+*Chromium_*.json
+*Firefox_*.json
+
+# Development files
+.env
+.env.local
+config.json
+secrets.json
