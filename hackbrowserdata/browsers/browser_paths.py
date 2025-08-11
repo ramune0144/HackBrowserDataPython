@@ -20,20 +20,37 @@ class BrowserPaths:
         
     def get_chrome_paths(self) -> List[str]:
         """Get Chrome profile paths"""
+        paths = []
+        
         if self.system == 'windows':
-            return [
-                os.path.join(self.home_dir, "AppData", "Local", "Google", "Chrome", "User Data", "Default"),
-                os.path.join(self.home_dir, "AppData", "Local", "Google", "Chrome Beta", "User Data", "Default"),
+            base_paths = [
+                os.path.join(self.home_dir, "AppData", "Local", "Google", "Chrome", "User Data"),
+                os.path.join(self.home_dir, "AppData", "Local", "Google", "Chrome Beta", "User Data"),
             ]
         elif self.system == 'darwin':  # macOS
-            return [
-                os.path.join(self.home_dir, "Library", "Application Support", "Google", "Chrome", "Default"),
+            base_paths = [
+                os.path.join(self.home_dir, "Library", "Application Support", "Google", "Chrome"),
             ]
         else:  # Linux
-            return [
-                os.path.join(self.home_dir, ".config", "google-chrome", "Default"),
-                os.path.join(self.home_dir, ".config", "google-chrome-beta", "Default"),
+            base_paths = [
+                os.path.join(self.home_dir, ".config", "google-chrome"),
+                os.path.join(self.home_dir, ".config", "google-chrome-beta"),
             ]
+        
+        # Find all profiles
+        for base_path in base_paths:
+            if os.path.exists(base_path):
+                # Add Default profile
+                default_path = os.path.join(base_path, "Default")
+                if os.path.exists(default_path):
+                    paths.append(default_path)
+                
+                # Add numbered profiles (Profile 1, Profile 2, etc.)
+                for item in os.listdir(base_path):
+                    if item.startswith("Profile ") and os.path.isdir(os.path.join(base_path, item)):
+                        paths.append(os.path.join(base_path, item))
+                        
+        return paths
     
     def get_edge_paths(self) -> List[str]:
         """Get Microsoft Edge profile paths"""
@@ -70,18 +87,37 @@ class BrowserPaths:
     
     def get_brave_paths(self) -> List[str]:
         """Get Brave browser profile paths"""
+        paths = []
+        
         if self.system == 'windows':
-            return [
-                os.path.join(self.home_dir, "AppData", "Local", "BraveSoftware", "Brave-Browser", "User Data", "Default"),
+            base_paths = [
+                os.path.join(self.home_dir, "AppData", "Local", "BraveSoftware", "Brave-Browser", "User Data"),
+                os.path.join(self.home_dir, "AppData", "Local", "BraveSoftware", "Brave-Browser-Beta", "User Data"),
+                os.path.join(self.home_dir, "AppData", "Local", "BraveSoftware", "Brave-Browser-Dev", "User Data"),
             ]
         elif self.system == 'darwin':  # macOS
-            return [
-                os.path.join(self.home_dir, "Library", "Application Support", "BraveSoftware", "Brave-Browser", "Default"),
+            base_paths = [
+                os.path.join(self.home_dir, "Library", "Application Support", "BraveSoftware", "Brave-Browser"),
             ]
         else:  # Linux
-            return [
-                os.path.join(self.home_dir, ".config", "BraveSoftware", "Brave-Browser", "Default"),
+            base_paths = [
+                os.path.join(self.home_dir, ".config", "BraveSoftware", "Brave-Browser"),
             ]
+        
+        # Find all profiles
+        for base_path in base_paths:
+            if os.path.exists(base_path):
+                # Add Default profile
+                default_path = os.path.join(base_path, "Default")
+                if os.path.exists(default_path):
+                    paths.append(default_path)
+                
+                # Add numbered profiles
+                for item in os.listdir(base_path):
+                    if item.startswith("Profile ") and os.path.isdir(os.path.join(base_path, item)):
+                        paths.append(os.path.join(base_path, item))
+                        
+        return paths
     
     def get_opera_paths(self) -> List[str]:
         """Get Opera browser profile paths"""

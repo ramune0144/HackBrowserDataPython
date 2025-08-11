@@ -77,9 +77,18 @@ class ChromiumBrowser(BaseBrowser):
     
     def _get_master_key(self) -> Optional[bytes]:
         """Get master key for decryption"""
-        local_state_path = os.path.join(os.path.dirname(self.profile_path), "Local State")
-        if os.path.exists(local_state_path):
-            return get_chromium_master_key(local_state_path)
+        # Try multiple possible locations for Local State file
+        possible_paths = [
+            os.path.join(os.path.dirname(self.profile_path), "Local State"),  # Standard location
+            os.path.join(os.path.dirname(os.path.dirname(self.profile_path)), "Local State"),  # User Data parent
+        ]
+        
+        for local_state_path in possible_paths:
+            if os.path.exists(local_state_path):
+                master_key = get_chromium_master_key(local_state_path)
+                if master_key:
+                    return master_key
+        
         return None
     
     def _get_data_file_path(self, data_type: DataType) -> Optional[str]:

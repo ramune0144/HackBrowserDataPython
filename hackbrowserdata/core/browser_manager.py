@@ -35,9 +35,9 @@ class BrowserManager:
         for browser in browsers:
             if browser.is_accessible():
                 accessible_browsers.append(browser)
-                self.logger.info(f"Found accessible browser: {browser.name} at {browser.profile_path}")
+                self.logger.info(f"✓ Found accessible browser: {browser.name} at {browser.profile_path}")
             else:
-                self.logger.warning(f"Browser not accessible: {browser.name} at {browser.profile_path}")
+                self.logger.debug(f"✗ Browser not accessible: {browser.name} at {browser.profile_path}")
         
         return accessible_browsers
     

@@ -8,18 +8,68 @@ env/
 venv/
 .venv/
 ENV/
+env.bak/
+venv.bak/
+.env
+.env.local
+.env.production.local
+.env.development.local
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/extensions.json
 
 # OS
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
-# CRITICAL: Never commit extracted browser data!
+# CRITICAL SECURITY: Never commit extracted browser data!
 # These files contain real passwords, cookies, and personal data
 *password*.json
 *cookie*.json
@@ -28,6 +78,22 @@ Thumbs.db
 *download*.json
 *localstorage*.json
 *sessionstorage*.json
+*chromiumpassword*
+*chromiumcookie*
+*chromiumhistory*
+*chromiumbookmark*
+*chromiumdownload*
+*chromiumlocalstorage*
+*chromiumsessionstorage*
+*firefoxpassword*
+*firefoxcookie*
+*firefoxhistory*
+*firefoxbookmark*
+*firefoxdownload*
+*firefoxlocalstorage*
+*firefoxsessionstorage*
+
+# Output directories
 *results*/
 *extract_*/
 *extraction*/
@@ -35,22 +101,39 @@ Thumbs.db
 *extracted_data*/
 *browser_data*/
 *backup*/
-*.zip
+output/
+results/
+extracted_data/
+browser_data/
 
-# Test files that might contain sensitive data
+# Compressed files that might contain sensitive data
+*.zip
+*.rar
+*.7z
+*.tar.gz
+*.tar.bz2
+*.tar
+
+# Test/Demo files that might contain sensitive data
 test_*.py
 analyze_*.py
 demo.py
 *_test_*
 *_demo_*
+debug_*.py
+*debug*
 
 # Log files
 *.log
+logs/
+*.log.*
 
 # Temporary files
 *.tmp
 *.temp
 *temp*
+.temp/
+temp/
 
 # Never commit anything that looks like extracted data
 *Edge_*.json
@@ -58,11 +141,33 @@ demo.py
 *Brave_*.json
 *Firefox_*.json
 *Opera_*.json
+*Vivaldi_*.json
 *Chromium_*.json
-*Firefox_*.json
+*Microsoft_Edge_*.json
+*Google_Chrome_*.json
+*Brave_Browser_*.json
+*Mozilla_Firefox_*.json
 
-# Development files
-.env
-.env.local
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# Configuration files that might contain sensitive data
 config.json
 secrets.json
+settings.json
+local_config.json
+
+# Windows executable files
+*.exe
+*.msi
+*.dll
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# macOS
+.AppleDouble
+.LSOverride

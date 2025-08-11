@@ -29,26 +29,44 @@ def decrypt_chromium_password(encrypted_password: bytes, master_key: bytes = Non
         if not encrypted_password:
             return ""
         
-        # Windows DPAPI decryption
+        # Windows DPAPI decryption (old format)
         if HAS_WIN32 and encrypted_password.startswith(b'\x01\x00\x00\x00'):
             try:
-                return win32crypt.CryptUnprotectData(encrypted_password, None, None, None, 0)[1].decode('utf-8')
+                decrypted = win32crypt.CryptUnprotectData(encrypted_password, None, None, None, 0)[1]
+                return decrypted.decode('utf-8', errors='ignore')
             except Exception:
                 pass
         
-        # AES decryption with master key
-        if master_key and encrypted_password.startswith(b'v10') or encrypted_password.startswith(b'v11'):
+        # AES decryption with master key (new format v10/v11)
+        if master_key and (encrypted_password.startswith(b'v10') or encrypted_password.startswith(b'v11')):
             try:
-                # Extract IV and encrypted data
+                # Extract IV (12 bytes) and encrypted data
                 iv = encrypted_password[3:15]
-                encrypted_data = encrypted_password[15:]
+                encrypted_data = encrypted_password[15:-16]  # Remove tag (last 16 bytes)
+                tag = encrypted_password[-16:]  # Authentication tag
                 
                 # Create AES cipher
                 cipher = AES.new(master_key, AES.MODE_GCM, nonce=iv)
                 
-                # Decrypt
-                decrypted = cipher.decrypt(encrypted_data[:-16])
-                return decrypted.decode('utf-8')
+                # Decrypt with authentication
+                decrypted = cipher.decrypt_and_verify(encrypted_data, tag)
+                return decrypted.decode('utf-8', errors='ignore')
+            except Exception as e:
+                # Try without authentication if that fails
+                try:
+                    iv = encrypted_password[3:15]
+                    encrypted_data = encrypted_password[15:]
+                    cipher = AES.new(master_key, AES.MODE_GCM, nonce=iv)
+                    decrypted = cipher.decrypt(encrypted_data[:-16])
+                    return decrypted.decode('utf-8', errors='ignore')
+                except Exception:
+                    pass
+        
+        # Try DPAPI fallback even without the header
+        if HAS_WIN32:
+            try:
+                decrypted = win32crypt.CryptUnprotectData(encrypted_password, None, None, None, 0)[1]
+                return decrypted.decode('utf-8', errors='ignore')
             except Exception:
                 pass
     
@@ -66,15 +84,31 @@ def get_chromium_master_key(local_state_path: str) -> Optional[bytes]:
         with open(local_state_path, 'r', encoding='utf-8') as f:
             local_state = json.load(f)
         
+        # Check if os_crypt exists
+        if 'os_crypt' not in local_state:
+            return None
+            
+        if 'encrypted_key' not in local_state['os_crypt']:
+            return None
+            
         encrypted_key = base64.b64decode(local_state['os_crypt']['encrypted_key'])
-        encrypted_key = encrypted_key[5:]  # Remove 'DPAPI' prefix
+        
+        # Remove 'DPAPI' prefix (5 bytes)
+        if encrypted_key.startswith(b'DPAPI'):
+            encrypted_key = encrypted_key[5:]
         
         if HAS_WIN32:
             try:
                 master_key = win32crypt.CryptUnprotectData(encrypted_key, None, None, None, 0)[1]
                 return master_key
-            except Exception:
-                pass
+            except Exception as e:
+                # Try different approach
+                try:
+                    # Sometimes the key doesn't need DPAPI decryption
+                    if len(encrypted_key) == 32:  # AES-256 key length
+                        return encrypted_key
+                except Exception:
+                    pass
     
     except Exception:
         pass

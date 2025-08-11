@@ -57,7 +57,9 @@ class ChromiumPasswordExtractor(BaseExtractor):
                 try:
                     from utils.crypto_utils import decrypt_chromium_password
                     
-                    password = decrypt_chromium_password(row[5], master_key) if row[5] else ""
+                    password = ""
+                    if row[5]:  # password_value exists
+                        password = decrypt_chromium_password(row[5], master_key)
                     
                     item = {
                         'origin_url': clean_url(row[0] or ""),
@@ -70,10 +72,11 @@ class ChromiumPasswordExtractor(BaseExtractor):
                         'date_last_used': time_epoch_to_datetime(row[7] or 0)
                     }
                     
-                    if item['origin_url'] or item['username']:  # Only add if has meaningful data
+                    # Only add entries if they have meaningful data
+                    if item['origin_url'] or item['username'] or item['password']:
                         self.data.append(item)
                         
-                except Exception as e:
+                except Exception:
                     continue
                     
         except sqlite3.Error:
